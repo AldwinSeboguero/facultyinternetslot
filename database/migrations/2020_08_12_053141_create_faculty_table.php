@@ -15,6 +15,17 @@ class CreateFacultyTable extends Migration
     {
         Schema::create('faculties', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->unsignedBigInteger('first_slot_id'); 
+            $table->foreign('first_slot_id')->references('id')->on('slots');
+            $table->unsignedBigInteger('second_slot_id'); 
+            $table->foreign('second_slot_id')->references('id')->on('slots');
+            $table->unsignedBigInteger('third_slot_id'); 
+            $table->foreign('third_slot_id')->references('id')->on('slots');
+            $table->unsignedBigInteger('forth_slot_id'); 
+            $table->foreign('forth_slot_id')->references('id')->on('slots');
+            $table->unsignedBigInteger('fifth_slot_id'); 
+            $table->foreign('fifth_slot_id')->references('id')->on('slots');
             $table->timestamps();
         });
     }
