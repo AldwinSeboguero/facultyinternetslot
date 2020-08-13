@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('app/get_slots', 'HomeConteroller@getSlots');
+Route::get('app/get_departments', 'HomeConteroller@getDepartments');
+Route::get('app/getData', 'HomeConteroller@getData');
+
