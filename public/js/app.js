@@ -2005,14 +2005,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      modal2: false,
+      modal_loading: false,
+      disable: false,
+      max: 5,
       data: {
         slot_id: null
       },
@@ -2020,89 +2019,71 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       departments: [],
       facultyItem: {
         name: '',
-        department: '',
-        firstSlot: '',
-        secondSlot: '',
-        thirdSlot: '',
-        forthSlot: '',
-        fifthSlot: ''
-      }
+        department: ''
+      },
+      model10: []
     };
   },
+  watch: {
+    model10: function model10(val) {
+      if (val.length == this.max) this.disable = true;else this.disable = false;
+    }
+  },
   methods: {
+    saveSlot: function saveSlot() {
+      if (this.facultyItem.name.trim() == '') return this.e('Full name is required');
+      if (!this.facultyItem.department) return this.e('Department is required');
+      if (this.model10.length == 0) return this.e('Slot is required');
+      if (this.model10.length < 2) return this.e('Please choose 4 more slot');
+      if (this.model10.length < 3) return this.e('Please choose 3 more slot');
+      if (this.model10.length < 4) return this.e('Please choose 2 more slot');
+      if (this.model10.length < 5) return this.e('Please choose 1 more slot');
+      this.modal2 = true;
+    },
     saveData: function saveData() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var res;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(_this.facultyItem.name.trim() == '')) {
-                  _context.next = 2;
-                  break;
-                }
+                // if(!this.facultyItem.secondSlot) return this.e('Slot No. 2 is required')
+                // if(!this.facultyItem.thirdSlot) return this.e('Slot No. 3 is required')
+                // if(!this.facultyItem.forthSlot) return this.e('Slot No. 4 is required')
+                // if(!this.facultyItem.fifthSlot) return this.e('Slot No. 5 is required')
+                _this.modal_loading = true;
+                setTimeout(function () {
+                  _this.modal_loading = false;
+                  _this.modal2 = false;
 
-                return _context.abrupt("return", _this.e('Full name is required'));
-
-              case 2:
-                if (_this.facultyItem.department) {
-                  _context.next = 4;
-                  break;
-                }
-
-                return _context.abrupt("return", _this.e('Department is required'));
+                  _this.$Message.success('Successfully delete');
+                }, 2000);
+                _context.next = 4;
+                return _this.callApi('post', 'app/saveFacultySlot', {
+                  'facultyItem': _this.facultyItem,
+                  'slot': _this.model10
+                });
 
               case 4:
-                if (_this.facultyItem.firstSlot) {
-                  _context.next = 6;
-                  break;
+                res = _context.sent;
+
+                if (res.status == 200) {
+                  // this.s('Slot has been assigned successfully!');
+                  _this.facultyItem.name = '';
+                  _this.facultyItem.department = '';
+                  _this.model10 = [];
+                  window.location.href = 'success';
+                } else {
+                  _this.swr();
                 }
 
-                return _context.abrupt("return", _this.e('Slot No. 1 is required'));
-
-              case 6:
-                if (_this.facultyItem.secondSlot) {
-                  _context.next = 8;
-                  break;
-                }
-
-                return _context.abrupt("return", _this.e('Slot No. 2 is required'));
-
-              case 8:
-                if (_this.facultyItem.thirdSlot) {
-                  _context.next = 10;
-                  break;
-                }
-
-                return _context.abrupt("return", _this.e('Slot No. 3 is required'));
-
-              case 10:
-                if (_this.facultyItem.forthSlot) {
-                  _context.next = 12;
-                  break;
-                }
-
-                return _context.abrupt("return", _this.e('Slot No. 4 is required'));
-
-              case 12:
-                if (_this.facultyItem.fifthSlot) {
-                  _context.next = 14;
-                  break;
-                }
-
-                return _context.abrupt("return", _this.e('Slot No. 5 is required'));
-
-              case 14:
                 console.log(_this.facultyItem.name);
                 console.log(_this.facultyItem.department);
-                console.log(_this.facultyItem.firstSlot);
-                console.log(_this.facultyItem.secondSlot);
-                console.log(_this.facultyItem.thirdSlot);
-                console.log(_this.facultyItem.forthSlot);
-                console.log(_this.facultyItem.fifthSlot);
+                console.log(_this.model10.length);
 
-              case 21:
+              case 9:
               case "end":
                 return _context.stop();
             }
@@ -84904,204 +84885,70 @@ var render = function() {
                               _vm._v(" "),
                               _c(
                                 "FormItem",
-                                { attrs: { label: "Slot No. 1" } },
+                                { attrs: { label: "Select Slot" } },
                                 [
                                   _c(
-                                    "Select",
+                                    "i-select",
                                     {
-                                      attrs: { placeholder: "Select slot" },
+                                      attrs: {
+                                        multiple: "",
+                                        placeholder: "Select exactly 5 slot"
+                                      },
                                       model: {
-                                        value: _vm.facultyItem.firstSlot,
+                                        value: _vm.model10,
                                         callback: function($$v) {
-                                          _vm.$set(
-                                            _vm.facultyItem,
-                                            "firstSlot",
-                                            $$v
-                                          )
+                                          _vm.model10 = $$v
                                         },
-                                        expression: "facultyItem.firstSlot"
+                                        expression: "model10"
                                       }
                                     },
-                                    _vm._l(_vm.slots, function(r, i) {
-                                      return _vm.slots.length
-                                        ? _c(
-                                            "Option",
-                                            { key: i, attrs: { value: r.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(r.day) +
-                                                  " " +
-                                                  _vm._s(r.time)
-                                              )
-                                            ]
-                                          )
-                                        : _vm._e()
-                                    }),
-                                    1
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "FormItem",
-                                { attrs: { label: "Slot No. 2" } },
-                                [
-                                  _c(
-                                    "Select",
-                                    {
-                                      attrs: { placeholder: "Select slot" },
-                                      model: {
-                                        value: _vm.facultyItem.secondSlot,
-                                        callback: function($$v) {
-                                          _vm.$set(
-                                            _vm.facultyItem,
-                                            "secondSlot",
-                                            $$v
-                                          )
-                                        },
-                                        expression: "facultyItem.secondSlot"
-                                      }
-                                    },
-                                    _vm._l(_vm.slots, function(r, i) {
-                                      return _vm.slots.length
-                                        ? _c(
-                                            "Option",
-                                            { key: i, attrs: { value: r.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(r.day) +
-                                                  " " +
-                                                  _vm._s(r.time)
-                                              )
-                                            ]
-                                          )
-                                        : _vm._e()
-                                    }),
-                                    1
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "FormItem",
-                                { attrs: { label: "Slot No. 3" } },
-                                [
-                                  _c(
-                                    "Select",
-                                    {
-                                      attrs: { placeholder: "Select slot" },
-                                      model: {
-                                        value: _vm.facultyItem.thirdSlot,
-                                        callback: function($$v) {
-                                          _vm.$set(
-                                            _vm.facultyItem,
-                                            "thirdSlot",
-                                            $$v
-                                          )
-                                        },
-                                        expression: "facultyItem.thirdSlot"
-                                      }
-                                    },
-                                    _vm._l(_vm.slots, function(r, i) {
-                                      return _vm.slots.length
-                                        ? _c(
-                                            "Option",
-                                            { key: i, attrs: { value: r.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(r.day) +
-                                                  " " +
-                                                  _vm._s(r.time)
-                                              )
-                                            ]
-                                          )
-                                        : _vm._e()
-                                    }),
-                                    1
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "FormItem",
-                                { attrs: { label: "Slot No. 4" } },
-                                [
-                                  _c(
-                                    "Select",
-                                    {
-                                      attrs: { placeholder: "Select slot" },
-                                      model: {
-                                        value: _vm.facultyItem.forthSlot,
-                                        callback: function($$v) {
-                                          _vm.$set(
-                                            _vm.facultyItem,
-                                            "forthSlot",
-                                            $$v
-                                          )
-                                        },
-                                        expression: "facultyItem.forthSlot"
-                                      }
-                                    },
-                                    _vm._l(_vm.slots, function(r, i) {
-                                      return _vm.slots.length
-                                        ? _c(
-                                            "Option",
-                                            { key: i, attrs: { value: r.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(r.day) +
-                                                  " " +
-                                                  _vm._s(r.time)
-                                              )
-                                            ]
-                                          )
-                                        : _vm._e()
-                                    }),
-                                    1
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "FormItem",
-                                { attrs: { label: "Slot No. 5" } },
-                                [
-                                  _c(
-                                    "Select",
-                                    {
-                                      attrs: { placeholder: "Select slot" },
-                                      model: {
-                                        value: _vm.facultyItem.fifthSlot,
-                                        callback: function($$v) {
-                                          _vm.$set(
-                                            _vm.facultyItem,
-                                            "fifthSlot",
-                                            $$v
-                                          )
-                                        },
-                                        expression: "facultyItem.fifthSlot"
-                                      }
-                                    },
-                                    _vm._l(_vm.slots, function(r, i) {
-                                      return _vm.slots.length
-                                        ? _c(
-                                            "Option",
-                                            { key: i, attrs: { value: r.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(r.day) +
-                                                  " " +
-                                                  _vm._s(r.time)
-                                              )
-                                            ]
-                                          )
-                                        : _vm._e()
-                                    }),
-                                    1
+                                    [
+                                      _vm._l(_vm.slots, function(r, i) {
+                                        return !r.available
+                                          ? _c(
+                                              "i-option",
+                                              {
+                                                key: i,
+                                                attrs: {
+                                                  disabled: true,
+                                                  value: r.id
+                                                }
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(r.day) +
+                                                    " " +
+                                                    _vm._s(r.time) +
+                                                    " | Full"
+                                                )
+                                              ]
+                                            )
+                                          : _vm._e()
+                                      }),
+                                      _vm._v(" "),
+                                      _vm._l(_vm.slots, function(r, i) {
+                                        return r.available
+                                          ? _c(
+                                              "i-option",
+                                              {
+                                                key: i,
+                                                attrs: {
+                                                  disabled: _vm.disable,
+                                                  value: r.id
+                                                }
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(r.day) +
+                                                    " " +
+                                                    _vm._s(r.time)
+                                                )
+                                              ]
+                                            )
+                                          : _vm._e()
+                                      })
+                                    ],
+                                    2
                                   )
                                 ],
                                 1
@@ -85114,15 +84961,92 @@ var render = function() {
                                     "Button",
                                     {
                                       attrs: { type: "primary" },
-                                      on: { click: _vm.saveData }
+                                      on: { click: _vm.saveSlot }
                                     },
                                     [_vm._v("Submit")]
                                   ),
                                   _vm._v(" "),
                                   _c(
-                                    "Button",
-                                    { staticStyle: { "margin-left": "8px" } },
-                                    [_vm._v("Cancel")]
+                                    "Modal",
+                                    {
+                                      attrs: { width: "400" },
+                                      model: {
+                                        value: _vm.modal2,
+                                        callback: function($$v) {
+                                          _vm.modal2 = $$v
+                                        },
+                                        expression: "modal2"
+                                      }
+                                    },
+                                    [
+                                      _c(
+                                        "p",
+                                        {
+                                          staticStyle: {
+                                            color: "#2d8cf0",
+                                            "text-align": "center"
+                                          },
+                                          attrs: { slot: "header" },
+                                          slot: "header"
+                                        },
+                                        [
+                                          _c("Icon", {
+                                            attrs: {
+                                              type: "ios-information-circle"
+                                            }
+                                          }),
+                                          _vm._v(" "),
+                                          _c("span", [
+                                            _vm._v("Submit confirmation")
+                                          ])
+                                        ],
+                                        1
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        {
+                                          staticStyle: {
+                                            "text-align": "center"
+                                          }
+                                        },
+                                        [
+                                          _c("p", [
+                                            _vm._v(
+                                              "After this task is submitted, the 5 slot will reserve for you."
+                                            )
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("p", [
+                                            _vm._v("Will you submit it?")
+                                          ])
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        {
+                                          attrs: { slot: "footer" },
+                                          slot: "footer"
+                                        },
+                                        [
+                                          _c(
+                                            "Button",
+                                            {
+                                              attrs: {
+                                                type: "info",
+                                                size: "large",
+                                                long: "",
+                                                loading: _vm.modal_loading
+                                              },
+                                              on: { click: _vm.saveData }
+                                            },
+                                            [_vm._v("Submit")]
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    ]
                                   )
                                 ],
                                 1
@@ -97561,7 +97485,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\FacultyInternetSlot\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\facultyinternetslot\resources\js\app.js */"./resources/js/app.js");
 
 
 /***/ })

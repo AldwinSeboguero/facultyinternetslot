@@ -19,4 +19,8 @@ Route::get('/', function () {
 Route::get('app/get_slots', 'HomeConteroller@getSlots');
 Route::get('app/get_departments', 'HomeConteroller@getDepartments');
 Route::get('app/getData', 'HomeConteroller@getData');
+Route::post('app/saveFacultySlot', 'HomeConteroller@saveFacultySlot');
+Route::get('success', function () {
+    return view('success');
+});
 

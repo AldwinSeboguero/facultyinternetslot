@@ -29,36 +29,30 @@
                 <Select v-model="facultyItem.department" placeholder="Select your department"> 
                     <Option :value="d.id" v-for="(d, i) in departments" :key="i" v-if="departments.length">{{d.name}}</Option>
                 </Select>
-            </FormItem>
-            <FormItem label="Slot No. 1">
-                <Select v-model="facultyItem.firstSlot" placeholder="Select slot"> 
-                    <Option :value="r.id" v-for="(r, i) in slots" :key="i" v-if="slots.length">{{r.day}} {{r.time}}</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="Slot No. 2">
-                <Select v-model="facultyItem.secondSlot" placeholder="Select slot"> 
-                    <Option :value="r.id" v-for="(r, i) in slots" :key="i" v-if="slots.length">{{r.day}} {{r.time}}</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="Slot No. 3">
-                <Select v-model="facultyItem.thirdSlot" placeholder="Select slot"> 
-                    <Option :value="r.id" v-for="(r, i) in slots" :key="i" v-if="slots.length">{{r.day}} {{r.time}}</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="Slot No. 4">
-                <Select v-model="facultyItem.forthSlot" placeholder="Select slot"> 
-                    <Option :value="r.id" v-for="(r, i) in slots" :key="i" v-if="slots.length">{{r.day}} {{r.time}}</Option>
-                </Select>
-            </FormItem>
-            <FormItem label="Slot No. 5">
-                <Select v-model="facultyItem.fifthSlot" placeholder="Select slot"> 
-                    <Option :value="r.id" v-for="(r, i) in slots" :key="i" v-if="slots.length">{{r.day}} {{r.time}}</Option>
-                </Select>
+            </FormItem> 
+            <FormItem label="Select Slot">
+                <i-select v-model="model10" multiple placeholder="Select exactly 5 slot">
+                <i-option :disabled="true" :value="r.id" v-for="(r, i) in slots" :key="i" v-if="!r.available">{{r.day}} {{r.time}} | Full</i-option>
+                <i-option :disabled="disable" :value="r.id" v-for="(r, i) in slots" :key="i" v-if="r.available">{{r.day}} {{r.time}}</i-option>
+            </i-select>
             </FormItem>
             
                     <FormItem>
-                        <Button type="primary" @click="saveData">Submit</Button>
-                        <Button style="margin-left: 8px">Cancel</Button>
+                        <Button type="primary" @click="saveSlot">Submit</Button>
+                        <!-- <Button style="margin-left: 8px">Cancel</Button> -->
+                         <Modal v-model="modal2" width="400">
+                            <p slot="header" style="color:#2d8cf0;text-align:center">
+                                <Icon type="ios-information-circle"></Icon>
+                                <span>Submit confirmation</span>
+                            </p>
+                            <div style="text-align:center">
+                                <p>After this task is submitted, the 5 slot will reserve for you.</p>
+                                <p>Will you submit it?</p>
+                            </div>
+                            <div slot="footer">
+                                <Button type="info" size="large" long :loading="modal_loading" @click="saveData">Submit</Button>
+                            </div>
+                        </Modal>
                     </FormItem>
                 </Form>
             </div>
@@ -67,12 +61,17 @@
             </Card>
         </Col> 
     </Row>
+    
 </template>
 <script>
 
     export default {
         data () {
             return {
+                modal2: false,
+                 modal_loading: false,
+                disable:false,
+                 max: 5,
                 data: {
                     slot_id: null,
                 },
@@ -81,31 +80,58 @@
                 facultyItem: {
                     name: '',
                     department: '',
-                    firstSlot: '',
-                    secondSlot: '',
-                    thirdSlot: '',
-                    forthSlot: '',
-                    fifthSlot: '',
-                }
+                },
+                model10: [],
             }
         },
+         watch: {
+            model10(val) { 
+                
+            if (val.length == this.max) this.disable=true
+            else this.disable=false
+            }
+
+            },
         methods : {
-            async saveData(){
-                if(this.facultyItem.name.trim()=='') return this.e('Full name is required')
+            saveSlot(){
+                 if(this.facultyItem.name.trim()=='') return this.e('Full name is required')
                 if(!this.facultyItem.department) return this.e('Department is required')
-                if(!this.facultyItem.firstSlot) return this.e('Slot No. 1 is required')
-                if(!this.facultyItem.secondSlot) return this.e('Slot No. 2 is required')
-                if(!this.facultyItem.thirdSlot) return this.e('Slot No. 3 is required')
-                if(!this.facultyItem.forthSlot) return this.e('Slot No. 4 is required')
-                if(!this.facultyItem.fifthSlot) return this.e('Slot No. 5 is required')
+                if(this.model10.length == 0) return this.e('Slot is required')
+                 if(this.model10.length < 2) return this.e('Please choose 4 more slot')
+                 if(this.model10.length < 3) return this.e('Please choose 3 more slot') 
+                 if(this.model10.length < 4) return this.e('Please choose 2 more slot')
+                 if(this.model10.length < 5) return this.e('Please choose 1 more slot')
+                 this.modal2 = true
+            },
+            async saveData(){
+               
+                // if(!this.facultyItem.secondSlot) return this.e('Slot No. 2 is required')
+                // if(!this.facultyItem.thirdSlot) return this.e('Slot No. 3 is required')
+                // if(!this.facultyItem.forthSlot) return this.e('Slot No. 4 is required')
+                // if(!this.facultyItem.fifthSlot) return this.e('Slot No. 5 is required')
+                  this.modal_loading = true;
+                setTimeout(() => {
+                    this.modal_loading = false;
+                    this.modal2 = false;
+                    this.$Message.success('Successfully delete');
+                }, 2000);
+                const res = await this.callApi('post','app/saveFacultySlot', {'facultyItem' : this.facultyItem,'slot' : this.model10})
+                if(res.status==200){
+                    // this.s('Slot has been assigned successfully!');
+                    this.facultyItem.name = '';
+                    this.facultyItem.department = '';
+                    this.model10 = [];
+                     window.location.href = 'success';
+
+                }else{
+                this.swr()
+                }
                console.log(this.facultyItem.name);
                 console.log(this.facultyItem.department);
-                 console.log(this.facultyItem.firstSlot);
-                  console.log(this.facultyItem.secondSlot);
-                   console.log(this.facultyItem.thirdSlot);
-                    console.log(this.facultyItem.forthSlot);
-                     console.log(this.facultyItem.fifthSlot);
+                 console.log(this.model10.length); 
             },
+             
+
         },
         async created() {
             // console.log(this.$route)
